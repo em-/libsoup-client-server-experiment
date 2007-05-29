@@ -29,26 +29,62 @@
 #include <glib.h>
 #include <glib-object.h>
 
+#include <libsoup/soup.h>
+#include <libsoup/soup-server.h>
+#include <libsoup/soup-server-message.h>
+
 
 static GMainLoop *loop;
 
 static void
-sighandler (int sig)
-{
-  g_main_loop_quit (loop);
+sighandler(int sig) {
+  g_main_loop_quit(loop);
 }
 
-int main ()
-{
-  g_type_init ();
-  loop = g_main_loop_new (NULL, FALSE);
-  signal (SIGINT, sighandler);
+static void
+server_cb(SoupServerContext *context,
+          SoupMessage *msg,
+          gpointer user_data) {
+  const SoupUri *uri = soup_message_get_uri(msg);
+  const char *mime_type;
+  GByteArray *body;
 
-  g_print ("Starting HTTP server\n");
+  if (context->method_id != SOUP_METHOD_ID_GET) {
+    soup_message_set_status(msg, SOUP_STATUS_NOT_IMPLEMENTED);
+    return;
+  }
 
-  g_main_loop_run (loop);
+  g_print("Requested '%s'\n", uri->path);
 
-  g_print ("Stopping HTTP server\n");
+  soup_message_set_status(msg, SOUP_STATUS_OK);
+  soup_server_message_set_encoding(SOUP_SERVER_MESSAGE(msg),
+                                   SOUP_TRANSFER_CONTENT_LENGTH);
+  soup_message_set_response(msg, "application/octet-stream",
+                            SOUP_BUFFER_STATIC, "Hello!", 6);
+}
+
+int main() {
+  SoupServer *server;
+  guint port;
+
+  g_type_init();
+  g_thread_init(NULL);
+
+  loop = g_main_loop_new(NULL, FALSE);
+  signal(SIGINT, sighandler);
+
+  server = soup_server_new(NULL, NULL);
+  soup_server_add_handler(server, "/test", NULL, server_cb, NULL, NULL);
+  g_object_get(server, "port", &port, NULL);
+
+  g_print("Starting HTTP server on port %d\n", port);
+  soup_server_run_async(server);
+  g_main_loop_run(loop);
+  g_print("Stopping HTTP server\n");
+
+  soup_server_quit(server);
+  g_object_unref(G_OBJECT(server));
 
   return 0;
 }
+
