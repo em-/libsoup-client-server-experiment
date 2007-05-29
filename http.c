@@ -65,7 +65,6 @@ server_cb(SoupServerContext *context,
 
 int main() {
   SoupServer *server;
-  guint port;
 
   g_type_init();
   g_thread_init(NULL);
@@ -75,9 +74,8 @@ int main() {
 
   server = soup_server_new(NULL, NULL);
   soup_server_add_handler(server, "/test", NULL, server_cb, NULL, NULL);
-  g_object_get(server, "port", &port, NULL);
 
-  g_print("Starting HTTP server on port %d\n", port);
+  g_print("Starting HTTP server on port %d\n", soup_server_get_port(server));
   soup_server_run_async(server);
   g_main_loop_run(loop);
   g_print("Stopping HTTP server\n");
