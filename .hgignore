@@ -1,0 +1,6 @@
+.*~$
+^http$
+
+syntax: glob
+*.swp
+*.o
