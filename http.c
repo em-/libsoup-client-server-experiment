@@ -82,6 +82,7 @@ int main() {
 
   soup_server_quit(server);
   g_object_unref(G_OBJECT(server));
+  g_main_loop_unref(loop);
 
   return 0;
 }
