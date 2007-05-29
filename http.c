@@ -46,8 +46,7 @@ server_cb(SoupServerContext *context,
           SoupMessage *msg,
           gpointer user_data) {
   const SoupUri *uri = soup_message_get_uri(msg);
-  const char *mime_type;
-  GByteArray *body;
+  gint i;
 
   if (context->method_id != SOUP_METHOD_ID_GET) {
     soup_message_set_status(msg, SOUP_STATUS_NOT_IMPLEMENTED);
@@ -58,9 +57,12 @@ server_cb(SoupServerContext *context,
 
   soup_message_set_status(msg, SOUP_STATUS_OK);
   soup_server_message_set_encoding(SOUP_SERVER_MESSAGE(msg),
-                                   SOUP_TRANSFER_CONTENT_LENGTH);
-  soup_message_set_response(msg, "application/octet-stream",
-                            SOUP_BUFFER_STATIC, "Hello!", 6);
+                                   SOUP_TRANSFER_CHUNKED);
+  for (i = 0; i < 4; i++) {
+    soup_message_add_chunk(msg, SOUP_BUFFER_STATIC, "Hello", 5);
+    soup_message_io_unpause(msg);
+  }
+  soup_message_add_final_chunk(msg);
 }
 
 int main() {
