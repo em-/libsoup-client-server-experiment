@@ -5,8 +5,14 @@ CC := gcc -c
 LINK := gcc
 
 SERVER_OBJECTS = server.o
+CLIENT_OBJECTS = client.o
+
+all: server client
 
 server: $(SERVER_OBJECTS)
+	$(LINK) $(LIBS) -o $@ $^
+
+client: $(CLIENT_OBJECTS)
 	$(LINK) $(LIBS) -o $@ $^
 
 %.o: %.c
