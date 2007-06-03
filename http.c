@@ -63,6 +63,7 @@ server_cb(SoupServerContext *context,
     soup_message_io_unpause(msg);
   }
   soup_message_add_final_chunk(msg);
+  soup_message_io_unpause(msg);
 }
 
 int main() {
