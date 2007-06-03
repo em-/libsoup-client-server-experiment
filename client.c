@@ -40,9 +40,15 @@ sighandler(int sig) {
 }
 
 static void
-client_cb(SoupMessage *msg,
-          gpointer user_data) {
+received_chunk_cb(SoupMessage *msg,
+                  gpointer user_data) {
   write(1, msg->response.body, msg->response.length);
+}
+
+static void
+finished_chunks_cb(SoupMessage *msg,
+                   gpointer user_data) {
+  g_signal_handlers_disconnect_by_func (msg, received_chunk_cb, NULL);
   g_main_loop_quit(loop);
 }
 
@@ -58,7 +64,9 @@ int main() {
 
   session = soup_session_async_new();
   msg = soup_message_new(SOUP_METHOD_GET, "http://localhost/");
-  soup_session_queue_message(session, msg, client_cb, NULL);
+  g_signal_connect(msg, "got_chunk", G_CALLBACK (received_chunk_cb), NULL);
+  soup_message_set_flags(msg, SOUP_MESSAGE_OVERWRITE_CHUNKS);
+  soup_session_queue_message(session, msg, finished_chunks_cb, NULL);
 
   g_main_loop_run(loop);
 
