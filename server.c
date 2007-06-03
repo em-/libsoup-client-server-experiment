@@ -1,5 +1,5 @@
 /*
- * main.c - Main file for the HTTP server/client
+ * server.c - HTTP server
  *
  * Copyright (C) 2007 Marco Barisione <marco@barisione.org>
  *
