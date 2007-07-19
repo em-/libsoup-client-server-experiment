@@ -42,7 +42,7 @@ sighandler(int sig) {
 static void
 received_chunk_cb(SoupMessage *msg,
                   gpointer user_data) {
-  write(1, msg->response.body, msg->response.length);
+  g_printf("received chunk '%.*s'\n", msg->response.length, msg->response.body);
 }
 
 static void
