@@ -75,7 +75,7 @@ int main() {
   loop = g_main_loop_new(NULL, FALSE);
   signal(SIGINT, sighandler);
 
-  server = soup_server_new(NULL, NULL);
+  server = soup_server_new(SOUP_SERVER_PORT, 3333, NULL);
   soup_server_add_handler(server, "/test", NULL, server_cb, NULL, NULL);
 
   g_print("Starting HTTP server on port %d\n", soup_server_get_port(server));

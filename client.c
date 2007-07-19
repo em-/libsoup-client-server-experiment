@@ -63,7 +63,7 @@ int main() {
   signal(SIGINT, sighandler);
 
   session = soup_session_async_new();
-  msg = soup_message_new(SOUP_METHOD_GET, "http://localhost/");
+  msg = soup_message_new(SOUP_METHOD_GET, "http://localhost:3333/test");
   g_signal_connect(msg, "got_chunk", G_CALLBACK (received_chunk_cb), NULL);
   soup_message_set_flags(msg, SOUP_MESSAGE_OVERWRITE_CHUNKS);
   soup_session_queue_message(session, msg, finished_chunks_cb, NULL);
