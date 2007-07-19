@@ -24,7 +24,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
 
 #include <glib.h>
 #include <glib-object.h>
@@ -35,11 +34,6 @@
 
 
 static GMainLoop *loop;
-
-static void
-sighandler(int sig) {
-  g_main_loop_quit(loop);
-}
 
 static void
 server_cb(SoupServerContext *context,
@@ -64,6 +58,8 @@ server_cb(SoupServerContext *context,
   }
   soup_message_add_final_chunk(msg);
   soup_message_io_unpause(msg);
+
+  g_main_loop_quit(loop);
 }
 
 int main() {
@@ -73,7 +69,6 @@ int main() {
   g_thread_init(NULL);
 
   loop = g_main_loop_new(NULL, FALSE);
-  signal(SIGINT, sighandler);
 
   server = soup_server_new(SOUP_SERVER_PORT, 3333, NULL);
   soup_server_add_handler(server, "/test", NULL, server_cb, NULL, NULL);
