@@ -9,6 +9,11 @@ CLIENT_OBJECTS = client.o
 
 all: server client
 
+run: server client
+	@./server &
+	@sleep 1
+	@./client
+
 server: $(SERVER_OBJECTS)
 	$(LINK) $(LIBS) -o $@ $^
 
