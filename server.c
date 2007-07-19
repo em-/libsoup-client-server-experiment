@@ -39,10 +39,13 @@ static void
 wrote_chunk_cb (SoupMessage *msg,
                 gpointer user_data) {
   static int i = 0;
+  gchar *chunk;
 
   if (i < 4) {
-    soup_message_add_chunk(msg, SOUP_BUFFER_STATIC, "Hello", 5);
+    chunk = g_strdup_printf("Hello %d", i);
+    soup_message_add_chunk(msg, SOUP_BUFFER_USER_OWNED, chunk, strlen(chunk));
     soup_message_io_unpause(msg);
+    g_free(chunk);
   } else {
     soup_message_add_final_chunk(msg);
     soup_message_io_unpause(msg);
